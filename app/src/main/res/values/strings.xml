@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">ElderCare</string>
+    <string name="monitoring">MONITORING</string>
+    <string name="amma_health">Amma\'s Health 👵</string>
+    <string name="live">LIVE</string>
+    <string name="refresh">Refresh</string>
+    <string name="last_update">Last update:</string>
+    <string name="every_10s">• every 10s</string>
+    <string name="blood_oxygen">Blood Oxygen</string>
+    <string name="heart_rate">Heart Rate</string>
+    <string name="temperature">Temperature</string>
+    <string name="normal">Normal</string>
+    <string name="low">Low</string>
+    <string name="high">High</string>
+    <string name="critical">Critical</string>
+    <string name="unit_percent">%</string>
+    <string name="unit_bpm">bpm</string>
+    <string name="unit_celsius">°C</string>
+    <string name="data_pipeline">DATA PIPELINE</string>
+    <string name="pipeline_text">ESP32 Wearable → WiFi → Firebase DB → Push → This App</string>
+    <string name="lora_text">⚡ LoRa → Doctor ESP32+LCD (SOS, no internet)</string>
+    <string name="simulate_events">SIMULATE HARDWARE EVENTS</string>
+    <string name="fall_detected">Fall Detected</string>
+    <string name="sos_button">SOS Button</string>
+    <string name="nav_home">Home</string>
+    <string name="nav_gps">GPS</string>
+    <string name="nav_alerts">Alerts</string>
+    <string name="nav_history">History</string>
+</resources>
