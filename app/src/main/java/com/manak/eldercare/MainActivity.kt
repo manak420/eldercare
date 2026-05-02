@@ -80,10 +80,19 @@ class MainActivity : AppCompatActivity() {
         // Bottom nav
         bottomNav.setOnItemSelectedListener { item ->
             when (item.itemId) {
-                R.id.nav_home    -> { /* already here */ true }
-                R.id.nav_gps     -> { Toast.makeText(this, "GPS coming soon", Toast.LENGTH_SHORT).show(); true }
-                R.id.nav_alerts  -> { Toast.makeText(this, "Alerts coming soon", Toast.LENGTH_SHORT).show(); true }
-                R.id.nav_history -> { Toast.makeText(this, "History coming soon", Toast.LENGTH_SHORT).show(); true }
+                R.id.nav_home -> { true }
+                R.id.nav_gps -> {
+                    startActivity(android.content.Intent(this, GpsActivity::class.java))
+                    true
+                }
+                R.id.nav_alerts -> {
+                    startActivity(android.content.Intent(this, AlertsActivity::class.java))
+                    true
+                }
+                R.id.nav_history -> {
+                    startActivity(android.content.Intent(this, HistoryActivity::class.java))
+                    true
+                }
                 else -> false
             }
         }
