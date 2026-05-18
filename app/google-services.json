@@ -1,0 +1,30 @@
+{
+  "project_info": {
+    "project_number": "161984706163",
+    "firebase_url": "https://eldercare-84c09-default-rtdb.asia-southeast1.firebasedatabase.app",
+    "project_id": "eldercare-84c09",
+    "storage_bucket": "eldercare-84c09.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:161984706163:android:4fab032fd77ea21f56dc06",
+        "android_client_info": {
+          "package_name": "com.manak.eldercare"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyD3g1yUw_FQgkLva3ABMiRshZq3GqFLUDo"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
