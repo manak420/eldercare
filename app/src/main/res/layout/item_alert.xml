@@ -45,8 +45,8 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="Manual SOS triggered"
-                android:textColor="#99FFFFFF"
-                android:textSize="11sp"
+                android:textColor="#FFFFFF"
+                android:textSize="12sp"
                 android:layout_marginTop="2dp"/>
 
             <TextView
@@ -54,8 +54,8 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="10:45 PM"
-                android:textColor="#40FFFFFF"
-                android:textSize="10sp"
+                android:textColor="#FFFFFF"
+                android:textSize="11sp"
                 android:layout_marginTop="4dp"/>
 
         </LinearLayout>

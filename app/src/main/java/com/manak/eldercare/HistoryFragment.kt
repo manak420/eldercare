@@ -65,11 +65,18 @@ class HistoryFragment : Fragment() {
                         val timestamp = child.child("timestamp").getValue(String::class.java) ?: ""
                         val type      = child.child("type").getValue(String::class.java) ?: "NORMAL"
 
+//                        records.add(0, VitalRecord(
+//                            time = timestamp,
+//                            spo2 = "%.1f%%".format(spo2),
+//                            hr   = "${hr.toInt()} bpm",
+//                            temp = "%.1f°C".format(temp)
+//                        ))
                         records.add(0, VitalRecord(
                             time = timestamp,
                             spo2 = "%.1f%%".format(spo2),
                             hr   = "${hr.toInt()} bpm",
-                            temp = "%.1f°C".format(temp)
+                            temp = "%.1f°C".format(temp),
+                            type = type
                         ))
                     }
                     adapter.notifyDataSetChanged()

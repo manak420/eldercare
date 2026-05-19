@@ -9,6 +9,9 @@ import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.google.firebase.database.*
+//import android.widget.TextView
+
+//private lateinit var tvNoAlerts: TextView
 
 class AlertsFragment : Fragment() {
 
@@ -28,14 +31,22 @@ class AlertsFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
 
         rvAlerts = view.findViewById(R.id.rvAlerts)
-        database = FirebaseDatabase.getInstance("https://eldercare-84c09-default-rtdb.asia-southeast1.firebasedatabase.app").getReference("vitals")
+//        tvNoAlerts = view.findViewById(R.id.tvNoAlerts)
+        database = FirebaseDatabase
+            .getInstance("https://eldercare-84c09-default-rtdb.asia-southeast1.firebasedatabase.app")
+            .getReference("alerts")
+//        database = FirebaseDatabase.getInstance("https://eldercare-84c09-default-rtdb.asia-southeast1.firebasedatabase.app").getReference("vitals")
         // Clear all button
+//        view.findViewById<Button>(R.id.btnClearAll).setOnClickListener {
+//            database.removeValue()
+//            alerts.clear()
+//            adapter.notifyDataSetChanged()
+//        }
+
         view.findViewById<Button>(R.id.btnClearAll).setOnClickListener {
-            database.removeValue()
             alerts.clear()
             adapter.notifyDataSetChanged()
         }
-
         // Setup adapter
         adapter = AlertAdapter(alerts)
         rvAlerts.layoutManager = LinearLayoutManager(requireContext())
@@ -50,10 +61,18 @@ class AlertsFragment : Fragment() {
             override fun onDataChange(snapshot: DataSnapshot) {
                 alerts.clear()
                 for (child in snapshot.children) {
-                    val title     = child.child("title").getValue(String::class.java) ?: ""
-                    val body      = child.child("body").getValue(String::class.java) ?: ""
-                    val timestamp = child.child("timestamp").getValue(String::class.java) ?: ""
+                    android.util.Log.d("ALERT_DEBUG", child.value.toString())
+//                    val title     = child.child("title").getValue(String::class.java) ?: ""
+//                    val body      = child.child("body").getValue(String::class.java) ?: ""
+//                    val timestamp = child.child("timestamp").getValue(String::class.java) ?: ""
 
+                    val title = child.child("title").getValue(String::class.java) ?: "Unknown Alert"
+
+                    val body = child.child("body").getValue(String::class.java)
+                        ?: "No details available"
+
+                    val timestamp = child.child("timestamp").getValue(String::class.java)
+                        ?: "--:--"
                     val emoji = when {
                         title.contains("SOS")  -> "🆘"
                         title.contains("Fall") -> "🚨"
@@ -76,6 +95,9 @@ class AlertsFragment : Fragment() {
                     alerts.add(0, Alert(emoji, title, body, timestamp, color))
                 }
                 adapter.notifyDataSetChanged()
+//                tvNoAlerts.visibility =
+//                    if (alerts.isEmpty()) View.VISIBLE else View.GONE
+
             }
 
             override fun onCancelled(error: DatabaseError) {}

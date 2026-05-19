@@ -11,6 +11,12 @@ import androidx.fragment.app.Fragment
 import com.google.firebase.database.*
 import java.text.SimpleDateFormat
 import java.util.*
+import androidx.cardview.widget.CardView
+import android.graphics.Color
+
+private lateinit var safeZoneCard: CardView
+private lateinit var tvZoneTitle: TextView
+private lateinit var tvZoneBody: TextView
 
 class HomeFragment : Fragment() {
 
@@ -25,7 +31,9 @@ class HomeFragment : Fragment() {
 
     private lateinit var database: DatabaseReference
     private var vitalsListener: ValueEventListener? = null
-
+    private var lastFall = false
+    private var lastSos = false
+    private var lastOutside = false
     private val DB_URL = "https://eldercare-84c09-default-rtdb.asia-southeast1.firebasedatabase.app"
 
     override fun onCreateView(
@@ -46,18 +54,23 @@ class HomeFragment : Fragment() {
         tvTempStatus = view.findViewById(R.id.tvTempStatus)
         tvLastUpdate = view.findViewById(R.id.tvLastUpdate)
         tvBattery    = view.findViewById(R.id.tvBattery)
+        safeZoneCard = view.findViewById(R.id.safeZoneCard)
+        tvZoneTitle = view.findViewById(R.id.tvZoneTitle)
+        tvZoneBody = view.findViewById(R.id.tvZoneBody)
 
         database = FirebaseDatabase.getInstance(DB_URL).getReference("vitals")
 
         view.findViewById<Button>(R.id.btnRefresh).setOnClickListener {
             Toast.makeText(requireContext(), "✓ Data is live!", Toast.LENGTH_SHORT).show()
         }
-        view.findViewById<Button>(R.id.btnFall).setOnClickListener {
-            Toast.makeText(requireContext(), "⚠️ Fall Detected! Alert sent via LoRa", Toast.LENGTH_LONG).show()
-        }
-        view.findViewById<Button>(R.id.btnSos).setOnClickListener {
-            Toast.makeText(requireContext(), "🆘 SOS Activated! Doctor notified", Toast.LENGTH_LONG).show()
-        }
+
+
+//        view.findViewById<Button>(R.id.btnFall).setOnClickListener {
+//            Toast.makeText(requireContext(), "⚠️ Fall Detected! Alert sent via LoRa", Toast.LENGTH_LONG).show()
+//        }
+//        view.findViewById<Button>(R.id.btnSos).setOnClickListener {
+//            Toast.makeText(requireContext(), "🆘 SOS Activated! Doctor notified", Toast.LENGTH_LONG).show()
+//        }
 
         listenForVitals()
     }
@@ -73,6 +86,43 @@ class HomeFragment : Fragment() {
                 val temp = snapshot.child("temp").getValue(Double::class.java) ?: 0.0
                 val sos  = snapshot.child("sos").getValue(Boolean::class.java) ?: false
                 val fall = snapshot.child("fall").getValue(Boolean::class.java) ?: false
+                val outsideZone = snapshot.child("outsideZone").getValue(Boolean::class.java) ?: false
+
+                if (fall && !lastFall) {
+                    pushAlert(
+                        "🚨 Fall Detected",
+                        "Sudden movement detected"
+                    )
+                }
+
+                if (sos && !lastSos) {
+                    pushAlert(
+                        "🆘 SOS Alert",
+                        "Emergency button pressed"
+                    )
+                }
+
+                if (outsideZone && !lastOutside) {
+                    pushAlert(
+                        "📍 Outside Safe Zone",
+                        "Elder moved outside safe area"
+                    )
+                }
+
+                lastFall = fall
+                lastSos = sos
+                lastOutside = outsideZone
+                if (outsideZone) {
+                    safeZoneCard.setCardBackgroundColor(Color.parseColor("#3A1010"))
+                    tvZoneTitle.text = "⚠️ Outside Safe Zone"
+                    tvZoneTitle.setTextColor(Color.parseColor("#FF6B6B"))
+                    tvZoneBody.text = "Elder has moved outside the 5 km safety radius."
+                } else {
+                    safeZoneCard.setCardBackgroundColor(Color.parseColor("#102A1A"))
+                    tvZoneTitle.text = "✅ Inside Safe Zone"
+                    tvZoneTitle.setTextColor(Color.parseColor("#4ADE80"))
+                    tvZoneBody.text = "Elder is within the 5 km safety radius."
+                }
 
                 tvSpo2.text = "%.1f".format(spo2)
                 tvHr.text   = hr.toInt().toString()
@@ -114,6 +164,64 @@ class HomeFragment : Fragment() {
 
         // THIS IS THE KEY LINE — attach the listener
         database.addValueEventListener(vitalsListener!!)
+    }
+
+    private fun pushAlert(title: String, body: String) {
+
+        android.util.Log.d("AUTO_ALERT", "Alert pushed: $title")
+
+        val sdf = java.text.SimpleDateFormat(
+            "dd MMM hh:mm a",
+            java.util.Locale.getDefault()
+        )
+
+        val alert = mapOf(
+            "title" to title,
+            "body" to body,
+            "timestamp" to sdf.format(java.util.Date())
+        )
+
+        FirebaseDatabase
+            .getInstance("https://eldercare-84c09-default-rtdb.asia-southeast1.firebasedatabase.app")
+            .getReference("alerts")
+            .push()
+            .setValue(alert)
+        showLocalNotification(title, body)
+    }
+
+
+    private fun showLocalNotification(title: String, body: String) {
+
+        val builder = androidx.core.app.NotificationCompat.Builder(
+            requireContext(),
+            "eldercare_alerts"
+        )
+            .setSmallIcon(android.R.drawable.ic_dialog_alert)
+            .setContentTitle(title)
+            .setContentText(body)
+            .setPriority(androidx.core.app.NotificationCompat.PRIORITY_HIGH)
+            .setAutoCancel(true)
+
+        val manager =
+            requireContext().getSystemService(
+                android.content.Context.NOTIFICATION_SERVICE
+            ) as android.app.NotificationManager
+
+        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
+
+            val channel = android.app.NotificationChannel(
+                "eldercare_alerts",
+                "ElderCare Alerts",
+                android.app.NotificationManager.IMPORTANCE_HIGH
+            )
+
+            manager.createNotificationChannel(channel)
+        }
+
+        manager.notify(
+            System.currentTimeMillis().toInt(),
+            builder.build()
+        )
     }
 
     private fun saveToHistory(spo2: Double, hr: Double, temp: Double, type: String) {
